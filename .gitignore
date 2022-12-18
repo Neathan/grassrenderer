@@ -1,3 +1,7 @@
 out
 libs
 .vs
+.cache
+documentation
+compile_commands.json
+CMakeSettings.json

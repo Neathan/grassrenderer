@@ -1,0 +1,139 @@
+#version 460 core
+layout(local_size_x = 8, local_size_y = 4, local_size_z = 1) in;
+
+
+layout(std430, binding = 0) buffer positionLayout {
+	vec2 positions[];
+};
+
+layout(std430, binding = 1) buffer directionLayout {
+	vec2 directions[];
+};
+
+layout(std430, binding = 2) buffer tiltLayout {
+	float tilts[];
+};
+
+layout(std430, binding = 3) buffer colorLayout {
+	vec4 colors[];
+};
+
+layout(std430, binding = 4) buffer widthLayout {
+	float widths[];
+};
+
+layout(std430, binding = 5) buffer bendLayout {
+	float bends[];
+};
+
+
+layout(location = 0) uniform vec2 base_position;
+layout(location = 1) uniform float padding;
+layout(location = 2) uniform int size;
+layout(location = 3) uniform float dimension;
+
+const int CLUMPS_PER_TILE = 4;
+const float MAX_TILT = 5;
+
+
+
+// ---- Random hash generation ----
+// Source and author "Spatial" can be found at: https://stackoverflow.com/a/17479300
+
+// A single iteration of Bob Jenkins' One-At-A-Time hashing algorithm.
+uint hash( uint x ) {
+	x += ( x << 10u );
+	x ^= ( x >>  6u );
+	x += ( x <<  3u );
+	x ^= ( x >> 11u );
+	x += ( x << 15u );
+	return x;
+}
+
+uint hash( uvec2 v ) { return hash( v.x ^ hash(v.y)                         ); }
+uint hash( uvec3 v ) { return hash( v.x ^ hash(v.y) ^ hash(v.z)             ); }
+uint hash( uvec4 v ) { return hash( v.x ^ hash(v.y) ^ hash(v.z) ^ hash(v.w) ); }
+
+float floatConstruct( uint m ) {
+	const uint ieeeMantissa = 0x007FFFFFu; // binary32 mantissa bitmask
+	const uint ieeeOne      = 0x3F800000u; // 1.0 in IEEE binary32
+
+	m &= ieeeMantissa;                     // Keep only mantissa bits (fractional part)
+	m |= ieeeOne;                          // Add fractional part to 1.0
+
+	float  f = uintBitsToFloat( m );       // Range [1:2]
+	return f - 1.0;                        // Range [0:1]
+}
+
+// Pseudo-random value in half-open range [0:1].
+float random( float x ) { return floatConstruct(hash(floatBitsToUint(x))); }
+float random( vec2  v ) { return floatConstruct(hash(floatBitsToUint(v))); }
+float random( vec3  v ) { return floatConstruct(hash(floatBitsToUint(v))); }
+float random( vec4  v ) { return floatConstruct(hash(floatBitsToUint(v))); }
+
+// ---- End of Random hash generation ----
+
+#define lerp(a, b, delta) a * delta + b * (1 - delta)
+
+void main() {
+	ivec2 coords = ivec2(gl_GlobalInvocationID.xy);
+
+	vec2 pos = vec2(coords) * padding + base_position;
+
+	int index = coords.x + coords.y * size;
+
+	float x = random(pos);
+	float y = random(pos + vec2(0.1, 0.1));
+	float z = random(pos + vec2(0.2, 0.2));
+
+	vec2 randomDir = normalize(vec2(x * 2 - 1, y * 2 - 1));
+	pos += randomDir;
+
+
+	float clumpSize = dimension / CLUMPS_PER_TILE;
+	float clumpX = round(pos.x / clumpSize);
+	float clumpY = round(pos.y / clumpSize);
+
+	// Find closest clump
+	float closestDistance = 100;
+	vec2 closestPos = vec2(0);
+	vec2 closestOffset = vec2(0);
+	for(int xx = -1; xx <= 1; ++xx) {
+		for(int yy = -1; yy <= 1; ++yy) {
+			vec2 clumpPos = vec2(clumpX + xx, clumpY + yy) * clumpSize;
+
+			float offsetX = random(clumpPos) * 2 - 1;
+			float offsetY = random(clumpPos + vec2(0.01)) * 2 - 1;
+
+			clumpPos += vec2(offsetX, offsetY) * clumpSize;
+
+			float dist = distance(pos, clumpPos);
+
+			if(dist < closestDistance) {
+				closestDistance = dist;
+				closestPos = clumpPos;
+
+				closestOffset = vec2(offsetX, offsetY); // Used for random values
+			}
+		}
+	}
+
+	vec2 clumpDirection = normalize(vec2(closestOffset.x, closestOffset.y));
+	float clumpTilt = (closestOffset.x + 1) / 2 * MAX_TILT;
+	vec4 clumpColor = lerp(vec4(0.27,0.42,0.11,1), vec4(vec3(0.3,0.45,0.13) * 1.1,1), closestOffset.y);
+
+	float normalizedDistance = clamp(2 * closestDistance / clumpSize, 0, 1);
+	float inverseDistance = 1 - normalizedDistance;
+
+	vec2 bladeDirection = randomDir;
+	float bladeTilt = z * MAX_TILT;
+	float bladeWidth = 0.1 * z + 0.1;
+	vec4 bladeColor = lerp(vec4(0.27,0.42,0.11,1), vec4(vec3(0.3,0.45,0.13) * 1.1,1), x);
+
+	positions[index] = lerp(closestPos, pos, x * 0.2);
+	directions[index] = lerp(clumpDirection, bladeDirection, inverseDistance / 2);
+	tilts[index] = lerp(clumpTilt, bladeTilt, min(1, inverseDistance * 2));
+	colors[index] = lerp(clumpColor, bladeColor, inverseDistance);
+	widths[index] = bladeWidth;
+	bends[index] = 0.15 + x * 0.2;
+}
