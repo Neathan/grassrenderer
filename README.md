@@ -2,6 +2,8 @@
 
 A simple grass renderer utilizing compute shaders and vertex manipulation to efficently render grass.
 
+[splash](docs/splash.jpg)
+
 ## Getting started
 
 The project uses submodules so to clone properly clone the repository please use `--recurse-submodules`.
