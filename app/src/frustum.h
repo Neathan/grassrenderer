@@ -1,5 +1,6 @@
-// Source: https://gist.github.com/podgorskiy/e698d18879588ada9014768e3e82a644
+#pragma once
 
+// Source: https://gist.github.com/podgorskiy/e698d18879588ada9014768e3e82a644
 
 #include <glm/matrix.hpp>
 

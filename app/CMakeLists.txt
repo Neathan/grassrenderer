@@ -1,4 +1,4 @@
-add_executable(app "src/main.cpp" "src/app.cpp" "src/app.h" "src/shader.h" "src/shader.cpp" "src/model.h" "src/model.cpp" "src/camera.h" "src/camera.cpp" "src/generator.h" "src/generator.cpp" "src/image.h" "src/image.cpp" "src/grass.h" "src/grass.cpp" "src/world.h" "src/world.cpp" "src/random/Xoshiro256plus.h" "src/random/SplitMix64.h" "src/frustum.h"  )
+add_executable(app "src/main.cpp" "src/app.cpp" "src/app.h" "src/shader.h" "src/shader.cpp" "src/model.h" "src/model.cpp" "src/camera.h" "src/camera.cpp" "src/generator.h" "src/generator.cpp" "src/image.h" "src/image.cpp" "src/grass.h" "src/grass.cpp" "src/world.h" "src/world.cpp" "src/frustum.h"  )
 
 set_property(TARGET app PROPERTY CXX_STANDARD 17)
 
