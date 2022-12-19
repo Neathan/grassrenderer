@@ -2,7 +2,7 @@
 
 A simple grass renderer utilizing compute shaders and vertex manipulation to efficently render grass.
 
-[splash](docs/splash.jpg)
+[splash](docs/splash.jpg?raw=true)
 
 ## Getting started
 
