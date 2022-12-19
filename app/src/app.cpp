@@ -65,18 +65,23 @@ void App::renderUI(float delta) {
 	static int fpsCounter = 0;
 	static int displayedFPS = 0;
 	static float fpsTimer = 0.0f;
+	static float avgFrameTime = 0.0f;
 
 	++fpsCounter;
 	fpsTimer += delta;
 
 	if (fpsTimer > 1.0f) {
-		fpsTimer -= 1.0f;
 		displayedFPS = fpsCounter;
+		avgFrameTime = fpsTimer / fpsCounter * 1000.0;
+
+		fpsTimer -= 1.0f;
 		fpsCounter = 0;
 	}
 
 	if (ImGui::Begin("Statistics")) {
 		ImGui::Text("FPS: %d", displayedFPS);
+		ImGui::Text("Avg: %.2f ms", avgFrameTime);
+		ImGui::Separator();
 		ImGui::Text("Tiles in view: %d", m_world->getRenderedTileCount());
 		ImGui::Text("High tiles: %d", m_world->getRenderedTileCountHigh());
 		ImGui::Text("Low tiles: %d", m_world->getRenderedTileCountLow());
