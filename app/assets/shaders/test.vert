@@ -54,7 +54,7 @@ const float MIDPOINT_FACTOR = 0.7;
 const float WIND_SPEED = 10.0f;
 const float TOTAL_WORLD_DIMENTION= 250;
 
-const float CHARACTER_SIZE = 5.0f;
+const float CHARACTER_SIZE = 7.0f;
 
 vec3 base, tip, bendPoint;
 vec3 up, right;
@@ -76,8 +76,9 @@ vec3 generatePath(float delta, vec3 direction, float tilt, float bend, float wid
 	vec3 toCharacter = (characterPos - tip - vec3(in_offset.x, 0, in_offset.y));
 	toCharacter.y = 0;
 	float dist = length(toCharacter);
+	float lengthBefore = length(tip);
 	tip -= normalize(toCharacter) * max((CHARACTER_SIZE - dist) * 0.5, 0) * useCharacterPos;
-
+	tip = normalize(tip) * lengthBefore;
 
 	vec3 midpoint = tip * MIDPOINT_FACTOR;
 	

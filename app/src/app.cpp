@@ -31,7 +31,7 @@ void App::init(GLFWwindow *window) {
 	m_program->unbind();
 
 	// Create world
-	m_world = std::make_shared<World>(5, 5);
+	m_world = std::make_shared<World>(10, 10);
 	m_world->generate(m_compute);
 
 	m_camera.installControls(window);
