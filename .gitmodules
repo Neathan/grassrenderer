@@ -1,0 +1,15 @@
+[submodule "libs/imgui/imgui"]
+	path = libs/imgui/imgui
+	url = https://github.com/ocornut/imgui.git
+[submodule "libs/glm"]
+	path = libs/glm
+	url = https://github.com/g-truc/glm
+[submodule "libs/spdlog"]
+	path = libs/spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "libs/FastNoise2"]
+	path = libs/FastNoise2
+	url = https://github.com/Auburn/FastNoise2.git
+[submodule "libs/glfw"]
+	path = libs/glfw
+	url = https://github.com/glfw/glfw.git
