@@ -13,8 +13,6 @@ void World::generate(const std::shared_ptr<ShaderProgram> &computeShader) {
 
 	m_tiles.reserve(m_width * m_height);
 
-	// TODO: To be replaced by compute shader
-	// FastNoise::SmartNode<> generator = FastNoise::NewFromEncodedNodeTree("FwAAAIC/AACAPwAAAAAAAIA/BwA=");
 	const float PADDING = TILE_DIMENSION / TILE_SIZE;
 
 	computeShader->bind();
