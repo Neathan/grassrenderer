@@ -2,8 +2,11 @@
 
 #include <glm/gtc/random.hpp>
 
+#include "profile.h"
 
 void World::generate(const std::shared_ptr<ShaderProgram> &computeShader) {
+	ProfileGPUScope("Generate world");
+
 	if (!m_tiles.empty()) {
 		m_tiles.clear();
 	}
@@ -22,35 +25,6 @@ void World::generate(const std::shared_ptr<ShaderProgram> &computeShader) {
 	// Create tiles
 	for (int y = 0; y < m_height; ++y) {
 		for (int x = 0; x < m_width; ++x) {
-			// TODO: To be replaced by compute shader
-			/*
-			std::vector<GLfloat> instanceOffset;
-			std::vector<GLfloat> instanceDirection;
-			std::vector<GLfloat> instanceTilt;
-
-			instanceOffset.reserve(TILE_SIZE * TILE_SIZE);
-			instanceDirection.reserve(TILE_SIZE * TILE_SIZE);
-
-			std::vector<GLfloat> tempHeight;
-			instanceTilt.resize(TILE_SIZE * TILE_SIZE);
-			tempHeight.resize(TILE_SIZE * TILE_SIZE);
-
-			generator->GenUniformGrid2D(tempHeight.data(), x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, FREQ, 1);
-			generator->GenUniformGrid2D(instanceTilt.data(), x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, FREQ, 0);
-
-			for (int zz = 0; zz < TILE_SIZE; ++zz) {
-				for (int xx = 0; xx < TILE_SIZE; ++xx) {
-					instanceOffset.push_back(x * TILE_DIMENSION + xx * PADDING);
-					instanceOffset.push_back(tempHeight.at(xx + zz * TILE_SIZE));
-					instanceOffset.push_back(y * TILE_DIMENSION + zz * PADDING);
-
-					glm::vec2 dir = glm::circularRand(1.0f);
-					instanceDirection.push_back(dir.x);
-					instanceDirection.push_back(dir.y);
-				}
-			}
-			*/
-
 			// Create tile
 			GrassData dataHigh = generateGrassData(SEGMENTS_HIGH, BLADE_WIDTH, BLADE_HEIGHT);
 			GrassData dataLow = generateGrassData(SEGMENTS_LOW, BLADE_WIDTH, BLADE_HEIGHT);
@@ -86,7 +60,6 @@ void World::generate(const std::shared_ptr<ShaderProgram> &computeShader) {
 
 			computeShader->uniformVec2(0, glm::vec2(x * TILE_DIMENSION, y * TILE_DIMENSION));
 			computeShader->dispatch(glm::ceil(TILE_SIZE / 8), glm::ceil(TILE_SIZE / 4), 1);
-			
 
 			TileData tileData{ offsets, directions, tilts, colors, widths, bends };
 
@@ -98,6 +71,8 @@ void World::generate(const std::shared_ptr<ShaderProgram> &computeShader) {
 }
 
 void World::render(const glm::vec3 &cameraPosition, float highLimit, const std::shared_ptr<ShaderProgram>& program, const Frustum &frustum) {
+	ProfileGPUScope("Render world");
+	
 	m_tilesRenderedLastFrameHigh = 0;
 	m_tilesRenderedLastFrameLow = 0;
 
@@ -121,7 +96,7 @@ void World::render(const glm::vec3 &cameraPosition, float highLimit, const std::
 			if (dist <= highLimit) {
 				++m_tilesRenderedLastFrameHigh;
 
-				if(debugLOD) program->uniformFloat(10, 0.0f);
+				if (debugLOD) program->uniformFloat(10, 0.0f);
 				glBindVertexArray(tile.getVAOHigh());
 				glDrawElementsInstanced(GL_TRIANGLES, tile.getElemCountHigh(), GL_UNSIGNED_INT, nullptr, TILE_SIZE * TILE_SIZE);
 			}

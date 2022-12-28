@@ -4,3 +4,7 @@ add_subdirectory(glm)
 add_subdirectory(spdlog)
 add_subdirectory(imgui)
 add_subdirectory(FastNoise2)
+
+
+option (TRACY_ENABLE "" ON)
+add_subdirectory(tracy)

@@ -10,6 +10,7 @@
 #include <iostream>
 
 #include "app.h"
+#include "profile.h"
 
 void APIENTRY glDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity,
 	GLsizei length, GLchar const *message, void const *user_param);
@@ -34,6 +35,10 @@ int main() {
 		spdlog::error("Failed to initialize OpenGL context");
 		return -1;
 	}
+
+	// Enable OpenGL profiling
+	ProfileRegisterGPUContext;
+
 
 	// Enable debug output
 	glEnable(GL_DEBUG_OUTPUT);
@@ -63,28 +68,40 @@ int main() {
 
 		double last = glfwGetTime();
 		while (!glfwWindowShouldClose(window)) {
-			glfwPollEvents();
+			{
+				ProfileScopeNamed("Input");
+				glfwPollEvents();
+			}
 
 			// Calculate delta time
 			double current = glfwGetTime();
 			float delta = (float)(current - last);
 			last = current;
 
-			app.update(delta);
-			app.render(delta);
+			{
+				ProfileScopeNamed("Update");
+				app.update(delta);
+			}
+			{
+				ProfileScopeNamed("Render");
+				app.render(delta);
+			}
 
+			{
+				ProfileScopeNamed("Render UI");
+				ImGui_ImplOpenGL3_NewFrame();
+				ImGui_ImplGlfw_NewFrame();
+				ImGui::NewFrame();
+			
+				app.renderUI(delta);
 
-			ImGui_ImplOpenGL3_NewFrame();
-			ImGui_ImplGlfw_NewFrame();
-			ImGui::NewFrame();
-
-			app.renderUI(delta);
-
-			ImGui::Render();
-			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
+				ImGui::Render();
+				ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+			}
 
 			glfwSwapBuffers(window);
+			ProfileFrame;
+			ProfileCollectGPU;
 		}
 	}
 
