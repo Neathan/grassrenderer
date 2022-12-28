@@ -7,7 +7,6 @@ target_link_libraries(app PUBLIC glfw)
 target_link_libraries(app PUBLIC glm)
 target_link_libraries(app PUBLIC spdlog)
 target_link_libraries(app PUBLIC imgui)
-target_link_libraries(app PUBLIC FastNoise2)
 target_link_libraries(app PUBLIC TracyClient)
 
 target_include_directories(app PUBLIC "src")
