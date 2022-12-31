@@ -9,6 +9,7 @@ target_link_libraries(app PUBLIC spdlog)
 target_link_libraries(app PUBLIC imgui)
 target_link_libraries(app PUBLIC TracyClient)
 
+
 target_include_directories(app PUBLIC "src")
 
 target_compile_definitions(app PUBLIC GLFW_INCLUDE_NONE TRACY_ENABLE)
@@ -29,11 +30,18 @@ file(GLOB SHADER_FILES
 add_custom_target(shaders)
 add_custom_target(shader_directory ALL COMMAND ${CMAKE_COMMAND} -E make_directory "${SHADER_BINARY_DIR}")
 
+find_program(shader_compiler "glslc")
+if(shader_compiler)
+	set(SHADER_COMPILER "glslc")
+else()
+	set(SHADER_COMPILER "${CMAKE_SOURCE_DIR}/bin/glslc")
+endif()
+
 foreach(FILE ${SHADER_FILES})
     get_filename_component(FILENAME ${FILE} NAME)
     add_custom_command(
         TARGET shaders
-        COMMAND "${CMAKE_SOURCE_DIR}/bin/glslc.exe" "--target-env=opengl" ${FILE} -o "${SHADER_BINARY_DIR}/${FILENAME}.spv"
+	COMMAND ${SHADER_COMPILER} "--target-env=opengl" ${FILE} -o "${SHADER_BINARY_DIR}/${FILENAME}.spv"
         DEPENDS ${FILE}
         COMMENT "Compiling shader: ${FILENAME}"
     )
