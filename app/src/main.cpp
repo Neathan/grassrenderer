@@ -95,8 +95,11 @@ int main() {
 			
 				app.renderUI(delta);
 
-				ImGui::Render();
-				ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+				{
+					ProfileGPUScope("Render UI");
+					ImGui::Render();
+					ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+				}
 			}
 
 			glfwSwapBuffers(window);
