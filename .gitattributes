@@ -1,0 +1,5 @@
+libs/** linguist-vendored
+
+app/src/stb_image.h linguist-vendored
+app/src/frustum.h linguist-vendored
+
