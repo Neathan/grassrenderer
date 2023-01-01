@@ -1,5 +1,7 @@
 # grassrenderer
 
+> **_Now works on Linux!_** 
+
 A simple grass renderer utilizing compute shaders and vertex manipulation to efficently render grass.
 
 ![splash](docs/splash.jpg)
