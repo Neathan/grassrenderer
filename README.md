@@ -28,4 +28,4 @@ cmake ..
 
 The code is tested on Windows and Linux using the MSVC/gcc compiler and OpenGL 4.6. The code is written with C++17 in mind but is likely not required.
 
-For linux the GLSL compiler it not included ([glslc](https://github.com/google/shaderc), ~600 MB file). Instead the compiled is assumed to already be installed or placed in the `bin` directory.
+For linux the GLSL compiler it not included ([glslc](https://github.com/google/shaderc), ~600 MB file). Instead the executable is assumed to already be installed or placed in the `bin` directory.
