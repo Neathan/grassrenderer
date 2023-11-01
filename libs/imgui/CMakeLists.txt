@@ -12,5 +12,7 @@ add_library(imgui
     "imgui/misc/cpp/imgui_stdlib.cpp"
 )
 
+target_compile_definitions(imgui PUBLIC GLFW_INCLUDE_NONE)
+
 target_include_directories(imgui PUBLIC imgui/)
 target_link_libraries(imgui PUBLIC glfw)
